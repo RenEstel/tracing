@@ -11,11 +11,12 @@ import org.zalando.logbook.CorrelationId;
 import org.zalando.logbook.HeaderFilter;
 import org.zalando.logbook.HeaderFilters;
 import org.zalando.logbook.HttpLogWriter;
-import org.zalando.logbook.Logbook;
 import org.zalando.logbook.QueryFilter;
 import org.zalando.logbook.QueryFilters;
+import org.zalando.logbook.json.JacksonJsonFieldBodyFilter;
 import org.zalando.logbook.json.JsonBodyFilters;
 
+import java.util.Arrays;
 import java.util.Set;
 
 @Configuration
@@ -23,7 +24,7 @@ public class ZalandoConfig {
     public static final String REPLACEMENT_STRING = "XXX";
     public static final int REPLACEMENT_INT = -1;
 
-    private final Set<String> defaultFilters = Set.of("accessToken", "access_token", "authToken", "auth_token", "token", "key", "phone", "email", "refresh_token");
+    private final Set<String> defaultFilters = Set.of("accessToken", "access_token", "authToken", "auth_token", "token", "key", "phone", "email", "refresh_token", "passport");
 
     @Bean
     public HttpLogWriter createHttpLogWriter() {
@@ -52,12 +53,23 @@ public class ZalandoConfig {
 
     @Bean
     public BodyFilter bodyFilter(
+            @Value("${logbook.body.filters.body:}") String[] bodyFilter,
             @Value("${logbook.body.filters.string:}") String[] stringFilter,
             @Value("${logbook.body.filters.number:}") String[] numberFilter,
             @Value("${logbook.body.max-size}") int maxSize
     ) {
         var filter = BodyFilters.defaultValue();
         filter = BodyFilter.merge(filter, BodyFilters.replaceFormUrlEncodedProperty(defaultFilters, REPLACEMENT_STRING));
+
+
+        var bodyFilters = new JacksonJsonFieldBodyFilter(Arrays.asList(bodyFilter), "YYY");
+
+        for (var item : bodyFilter) {
+            filter = BodyFilter.merge(
+                    filter,
+                    bodyFilters
+            );
+        }
 
         for (var item : stringFilter) {
             filter = BodyFilter.merge(

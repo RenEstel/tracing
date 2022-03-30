@@ -14,7 +14,8 @@ logbook:
   body:
     max-size: 3000
     filters:
-      string: phone,email,name,passport,answer,query
+      body: passport
+      string: phone,email,name,answer,query
       number: latitude,longitude,lat,lon
   headers:
     enabled: false

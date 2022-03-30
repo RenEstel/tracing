@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestDto {
-    private String query;
-    private InnerDto passport;
+public class InnerDto {
+    private String some;
 }
